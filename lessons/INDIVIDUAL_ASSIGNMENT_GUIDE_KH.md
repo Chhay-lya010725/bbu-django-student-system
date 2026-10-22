@@ -208,8 +208,7 @@ git push -u origin main
 2. ពិនិត្យមើល៖
    - ទំព័រដើម និង Theme ថ្មីរបស់អ្នកដំណើរការស្អាត
    - ចុចចូល `/admin/` ហើយ Login ដោយប្រើ៖
-     - **Username**: `admin`
-     - **Password**: `admin123456`
+     - ប្រើ Superuser ដែលបានបង្កើតដោយសុវត្ថិភាពសម្រាប់ Environment នេះ
    - សាកល្បងចុះឈ្មោះសិស្សថ្មី (`/students/register/`)
    - សាកល្បងចុះឈ្មោះមុខវិជ្ជា (`/enrollments/create/`) ដោយប្រើ **Searchable Select**
 
@@ -242,8 +241,7 @@ git push -u origin main
 - Live Production URL (Render): https://[YOUR_APP_NAME].onrender.com
 - Admin URL: https://[YOUR_APP_NAME].onrender.com/admin/
 - Admin Account:
-  - Username: admin
-  - Password: admin123456
+  - បង្កើត Superuser ដោយប្រើពាក្យសម្ងាត់ឯកជន មុនចូល Admin
 
 ### 🎨 ការកែសម្រួល Interface & Theme (Customization Summary)
 - ស្ទីល Theme ដែលបានជ្រើសរើស: [ឧ. Emerald Modern / Dark Neon / Royal Navy]

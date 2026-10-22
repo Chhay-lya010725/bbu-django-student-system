@@ -69,11 +69,38 @@ class SystemAPITests(TestCase):
         self.assertEqual(response.data['khmer_name'], 'ចាន់ សុខា')
 
     def test_student_api_search_khmer_name(self):
+        other_user = User.objects.create_user(username='student2')
+        Student.objects.create(
+            user=other_user,
+            student_id='BBU2026002',
+            date_of_birth=date(2004, 1, 1),
+            gender='F',
+            address='Street 2',
+            city='Battambang',
+            country='Cambodia',
+        )
         response = self.client.get('/api/students/?search=សុខា')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data.get('results', response.data)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['student_id'], 'BBU2026001')
+
+    def test_student_api_filter_and_ordering(self):
+        other_user = User.objects.create_user(username='student2')
+        Student.objects.create(
+            user=other_user,
+            student_id='BBU2026002',
+            date_of_birth=date(2004, 1, 1),
+            gender='F',
+            address='Street 2',
+            city='Phnom Penh',
+            country='Cambodia',
+        )
+        response = self.client.get('/api/students/?city=Phnom%20Penh&ordering=-student_id')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data.get('results', response.data)
+        self.assertEqual(len(results), 2)
+        self.assertEqual([student['student_id'] for student in results], ['BBU2026002', 'BBU2026001'])
 
     def test_student_api_enrollments_action(self):
         response = self.client.get(f'/api/students/{self.student.pk}/enrollments/')
@@ -87,6 +114,29 @@ class SystemAPITests(TestCase):
         self.assertEqual(response.data['completed_courses'], 1)
         self.assertAlmostEqual(response.data['average_score'], 92.5)
 
+    def test_student_api_transcript_average_includes_zero_scores(self):
+        course = Course.objects.create(
+            code='IT-103',
+            title='Foundations of Computing',
+            description='Introductory computing concepts.',
+            instructor=self.instructor,
+            credits=3,
+            level='100',
+            capacity=30,
+            status='ACTIVE',
+            start_date=date(2026, 2, 1),
+            end_date=date(2026, 6, 30),
+        )
+        Enrollment.objects.create(
+            student=self.student,
+            course=course,
+            status='COMPLETED',
+            score=0,
+        )
+        response = self.client.get(f'/api/students/{self.student.pk}/transcript/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertAlmostEqual(response.data['average_score'], 46.25)
+
     def test_course_api_list_and_detail(self):
         response = self.client.get('/api/courses/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -94,6 +144,33 @@ class SystemAPITests(TestCase):
         response_detail = self.client.get(f'/api/courses/{self.course.pk}/')
         self.assertEqual(response_detail.status_code, status.HTTP_200_OK)
         self.assertEqual(response_detail.data['code'], 'IT-101')
+
+    def test_course_api_requires_authentication_for_writes(self):
+        anonymous_client = APIClient()
+        response = anonymous_client.post('/api/courses/', {}, format='json')
+        self.assertIn(response.status_code, (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+
+    def test_api_token_authentication(self):
+        token_response = APIClient().post(
+            '/api/token/',
+            {'username': self.user.username, 'password': 'Password@123'},
+            format='json',
+        )
+        self.assertEqual(token_response.status_code, status.HTTP_200_OK)
+        token_client = APIClient()
+        token_client.credentials(HTTP_AUTHORIZATION=f"Token {token_response.data['token']}")
+        students_response = token_client.get('/api/students/')
+        self.assertEqual(students_response.status_code, status.HTTP_200_OK)
+
+    def test_api_rejects_invalid_grade_values(self):
+        response = self.client.post(
+            f'/api/enrollments/{self.enrollment.pk}/submit_grade/',
+            {'score': 101},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.enrollment.refresh_from_db()
+        self.assertEqual(float(self.enrollment.score), 92.5)
 
     def test_course_api_students_and_stats(self):
         students_resp = self.client.get(f'/api/courses/{self.course.pk}/students/')

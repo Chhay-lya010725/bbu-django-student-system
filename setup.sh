@@ -38,19 +38,8 @@ python manage.py migrate -q
 echo "✅ Migrations ដាក់ដំណើរការចប់"
 
 echo ""
-echo "👨‍💼 បង្កើត Superuser (Admin)..."
-echo "ឈ្មោះប្រើប្រាស់: admin"
-echo "អ៊ីមែល: admin@example.com"
-echo "ល៍ឈ្មោះសម្ងាត់: admin123456"
-
-python manage.py shell << END
-from django.contrib.auth.models import User
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123456')
-    print("✅ Superuser admin បង្កើតចប់")
-else:
-    print("⚠️ Superuser admin មាន")
-END
+echo "👨‍💼 Create an admin account with a private password..."
+python manage.py createsuperuser
 
 echo ""
 echo "✨ ការរៀបចំលឿនគ្រប់គ្រងចប់!"

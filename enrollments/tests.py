@@ -38,6 +38,20 @@ class EnrollmentModelTest(TestCase):
         )
         self.assertEqual(enrollment.grade, 'A')
 
+    def test_grade_recalculates_when_score_changes_including_zero(self):
+        enrollment = Enrollment.objects.create(
+            student=self.student,
+            course=self.course,
+            score=92.5
+        )
+        enrollment.score = 0
+        enrollment.save()
+        self.assertEqual(enrollment.grade, 'F')
+
+        enrollment.score = 85
+        enrollment.save()
+        self.assertEqual(enrollment.grade, 'B')
+
     def test_enrollment_str(self):
         enrollment = Enrollment.objects.create(
             student=self.student,

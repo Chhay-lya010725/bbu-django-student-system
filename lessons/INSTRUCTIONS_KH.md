@@ -379,7 +379,7 @@ python manage.py migrate
 
 # ៣. បង្កើត Admin Superuser
 python manage.py createsuperuser
-# បញ្ចូល Username (ឧ. admin), Email, និង Password (ឧ. admin123456)
+# បញ្ចូល Username, Email, និងពាក្យសម្ងាត់ឯកជនរបស់អ្នក
 ```
 
 ---

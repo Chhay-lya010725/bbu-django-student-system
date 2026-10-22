@@ -19,8 +19,7 @@ source venv/bin/activate
 python manage.py runserver
 
 # 4. Admin login: http://127.0.0.1:8000/admin/
-#    Username: admin
-#    Password: admin123456
+#    Create a superuser first with: python manage.py createsuperuser
 ```
 
 ---
@@ -190,7 +189,7 @@ curl http://127.0.0.1:8000/api/courses/
    → Show statistics (students, courses, enrollments)
 
 2. Show admin: http://127.0.0.1:8000/admin/
-   → Login with admin/admin123456
+   → Sign in with the superuser configured for this environment
    → Create a student
    → Show list, filter, search
 
@@ -389,4 +388,3 @@ Everything is set up and ready to use. Start with Session 1 and progress through
 Created by: Build Bright University (BBU)  
 Date: October 1, 2024  
 Project: Student Management System - Django Full-Stack
-

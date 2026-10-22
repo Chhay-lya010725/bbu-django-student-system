@@ -1,226 +1,89 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - Student Management System{% endblock %}
+{% block title %}Overview | BBU Student Portal{% endblock %}
 
 {% block content %}
-<div class="jumbotron bg-light p-5 rounded">
-    <h1 class="display-4">📚 ប្រព័ន្ធគ្រប់គ្រងនិស្សិត</h1>
-    <p class="lead">Student Management System by Build Bright University</p>
-    <hr class="my-4">
-    <p>ស្វាគមន៍ដល់ប្រព័ន្ធគ្រប់គ្រងនិស្សិតដែលប្រើ Django Framework។</p>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-3 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h5 class="card-title">👥 សិស្ស</h5>
-                <h2 class="text-primary">{{ total_students }}</h2>
-                <p class="text-muted">សិស្សសរុប</p>
-            </div>
-            <div class="card-footer">
+<div class="home-dashboard">
+    <section class="home-hero">
+        <div class="hero-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> BUILD BRIGHT UNIVERSITY <span class="eyebrow-divider">/</span> CAMPUS PORTAL</span>
+            <h1>Make your next<br><span>move matter.</span></h1>
+            <p class="hero-description">One clear view of your campus community. Find students, explore courses, and keep every enrollment moving forward.</p>
+            <div class="hero-actions">
                 {% if user.is_authenticated and not user.is_staff and user.student %}
-                <a href="{% url 'students:student_detail' user.student.pk %}" class="btn btn-sm btn-primary">មើលប្រវត្តិរូបខ្ញុំ</a>
+                <a href="{% url 'students:student_detail' user.student.pk %}" class="btn btn-hero-primary">My profile <span aria-hidden="true">↗</span></a>
                 {% else %}
-                <a href="{% url 'students:student_list' %}" class="btn btn-sm btn-primary">មើលលម្អិត</a>
+                <a href="{% url 'students:student_list' %}" class="btn btn-hero-primary">Explore students <span aria-hidden="true">↗</span></a>
                 {% endif %}
+                <a href="{% url 'courses:course_list' %}" class="btn btn-hero-secondary">Browse courses</a>
             </div>
+            <div class="hero-note"><span aria-hidden="true">✦</span> Learning today. Leading tomorrow.</div>
         </div>
-    </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h5 class="card-title">📖 វគ្គ</h5>
-                <h2 class="text-success">{{ total_courses }}</h2>
-                <p class="text-muted">វគ្គសរុប</p>
-            </div>
-            <div class="card-footer">
-                <a href="{% url 'courses:course_list' %}" class="btn btn-sm btn-success">មើលលម្អិត</a>
-            </div>
+        <div class="hero-art" aria-hidden="true">
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <div class="art-sun"></div>
+            <div class="art-monogram">BBU</div>
+            <div class="art-caption"><span>CAMBODIA</span><strong>Bright futures<br>start here.</strong></div>
+            <div class="art-index">11°33' N<br>104°55' E</div>
+            <div class="art-spark spark-one">✳</div>
+            <div class="art-spark spark-two">✦</div>
         </div>
-    </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h5 class="card-title">✍️ ការចុះឈ្មោះ</h5>
-                <h2 class="text-info">{{ total_enrollments }}</h2>
-                <p class="text-muted">ការចុះឈ្មោះសរុប</p>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="snapshot-title">
+        <div class="section-heading">
+            <div>
+                <span class="section-kicker">THE CAMPUS AT A GLANCE</span>
+                <h2 id="snapshot-title">Your community, in motion.</h2>
             </div>
-            <div class="card-footer">
-                <a href="{% url 'enrollments:enrollment_list' %}" class="btn btn-sm btn-info">មើលលម្អិត</a>
-            </div>
+            <a href="{% url 'enrollments:enrollment_list' %}" class="text-link">View enrollments <span aria-hidden="true">↗</span></a>
         </div>
-    </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h5 class="card-title">⚙️ Admin</h5>
-                <h2 class="text-warning">🔧</h2>
-                <p class="text-muted">ផ្ទាំងគ្រប់គ្រង</p>
-            </div>
-            <div class="card-footer">
-                <a href="/admin/" class="btn btn-sm btn-warning">ចូលគ្រប់គ្រង</a>
-            </div>
+        <div class="metrics-grid">
+            <a class="metric-card metric-students" href="{% url 'students:student_list' %}">
+                <span class="metric-icon" aria-hidden="true">01</span>
+                <span class="metric-label">STUDENTS</span>
+                <strong class="metric-number">{{ total_students }}</strong>
+                <span class="metric-foot">{{ active_students }} active learners <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="metric-card metric-courses" href="{% url 'courses:course_list' %}">
+                <span class="metric-icon" aria-hidden="true">02</span>
+                <span class="metric-label">COURSES</span>
+                <strong class="metric-number">{{ total_courses }}</strong>
+                <span class="metric-foot">{{ active_courses }} currently active <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="metric-card metric-enrollments" href="{% url 'enrollments:enrollment_list' %}">
+                <span class="metric-icon" aria-hidden="true">03</span>
+                <span class="metric-label">ENROLLMENTS</span>
+                <strong class="metric-number">{{ total_enrollments }}</strong>
+                <span class="metric-foot">Across the whole campus <span aria-hidden="true">↗</span></span>
+            </a>
         </div>
-    </div>
+    </section>
+
+    <section class="portal-bottom">
+        <div class="portal-message">
+            <span class="section-kicker">A BETTER WAY TO STAY IN SYNC</span>
+            <h2>Everything important.<br>Right where you need it.</h2>
+            <p>Spend less time searching and more time helping students find their path.</p>
+        </div>
+        <div class="quick-links">
+            <a href="{% url 'students:student_list' %}" class="quick-link">
+                <span class="quick-link-icon" aria-hidden="true">↗</span>
+                <span><strong>Student directory</strong><small>Find a learner and their details</small></span>
+                <span class="quick-arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="{% url 'courses:course_list' %}" class="quick-link">
+                <span class="quick-link-icon" aria-hidden="true">▤</span>
+                <span><strong>Course catalog</strong><small>Explore classes and instructors</small></span>
+                <span class="quick-arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="{% url 'enrollments:enrollment_list' %}" class="quick-link">
+                <span class="quick-link-icon" aria-hidden="true">◎</span>
+                <span><strong>Enrollment records</strong><small>Track progress and grades</small></span>
+                <span class="quick-arrow" aria-hidden="true">→</span>
+            </a>
+        </div>
+    </section>
 </div>
-
-<!-- Demo Test Accounts for All 3 Roles -->
-<div class="row mt-4 mb-2">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9ff 0%, #edf2f7 100%);">
-            <div class="card-body p-4">
-                <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                    <div class="d-flex align-items-center">
-                        <span class="fs-1 me-3">🔑</span>
-                        <div>
-                            <h3 class="mb-1 fw-bold text-dark">គណនីសាកល្បងតាមតួនាទីទាំង ៣ (Demo Test Accounts for All 3 Roles)</h3>
-                            <p class="text-muted mb-0 small">
-                                សាកល្បងសិទ្ធិប្រើប្រាស់ និងប្រព័ន្ធការពារសុវត្ថិភាព (Role-Based Access Control) រវាង Admin, Teacher, និង Student:
-                            </p>
-                        </div>
-                    </div>
-                    <span class="badge bg-primary px-3 py-2 mt-2 mt-md-0">BBU RBAC System</span>
-                </div>
-
-                <div class="row g-4 pt-2">
-                    {% for acc in test_accounts %}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card h-100 shadow-sm border {{ acc.border_class }} bg-white">
-                            <div class="card-header bg-white border-0 pt-3 pb-1 d-flex justify-content-between align-items-center">
-                                <span class="fs-3">{{ acc.icon }}</span>
-                                <span class="badge {{ acc.badge_class }} py-2 px-3 fw-semibold">{{ acc.badge }}</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="fw-bold mb-2">{{ acc.role_title }}</h5>
-                                <p class="text-muted small mb-3">{{ acc.description }}</p>
-
-                                <div class="bg-light p-3 rounded mb-3 border">
-                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
-                                        <span class="text-secondary small fw-bold">Username:</span>
-                                        <div class="d-flex align-items-center">
-                                            <code class="fs-6 fw-bold text-dark me-2">{{ acc.username }}</code>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="copyToClipboard('{{ acc.username }}', this)" title="Copy username">📋 Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-secondary small fw-bold">Password:</span>
-                                        <div class="d-flex align-items-center">
-                                            <code class="fs-6 fw-bold text-dark me-2">{{ acc.password }}</code>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="copyToClipboard('{{ acc.password }}', this)" title="Copy password">📋 Copy</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3 flex-grow-1">
-                                    <strong class="small text-muted d-block mb-1">វិសាលភាពសិទ្ធិ (Access Scope):</strong>
-                                    <ul class="list-unstyled small mb-0">
-                                        {% for s in acc.scope %}
-                                        <li class="mb-1 text-secondary">
-                                            <i class="fas fa-check-circle text-success me-1"></i> {{ s }}
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-
-                                <div class="mt-auto pt-2">
-                                    {% if user.is_authenticated and user.username == acc.username %}
-                                    <div class="alert alert-success py-2 text-center small mb-0">
-                                        ✅ កំពុង Login ជាមួយគណនីនេះ (Active)
-                                    </div>
-                                    {% else %}
-                                    <a href="{{ acc.login_url }}" class="btn {{ acc.btn_class }} btn-sm w-100 py-2 fw-semibold">
-                                        {{ acc.button_text }} &rarr;
-                                    </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-4">
-        <h3>📊 ស្ថានភាព</h3>
-        <ul class="list-group">
-            <li class="list-group-item">
-                <strong>សិស្សដែលសកម្ម:</strong> {{ active_students }}
-            </li>
-            <li class="list-group-item">
-                <strong>វគ្គដែលសកម្ម:</strong> {{ active_courses }}
-            </li>
-        </ul>
-    </div>
-    
-    <div class="col-md-8">
-        <h3>🎯 ដូចម្តេច ចាប់ផ្តើម</h3>
-        <div class="alert alert-info">
-            <h5>ត្រើងយល់ដឹង ប្រព័ន្ធគ្រប់គ្រងនិស្សិត:</h5>
-            <ol>
-                <li>ចូលក្នុង Admin Panel សម្រាប់ management ពេញលេញ</li>
-                <li>ឆ្លើយ Students, Courses, Enrollments pages</li>
-                <li>សាកល្បង REST API នៅលើ /api/ URL</li>
-                <li>អានឯកសារលម្អិតក្នុងថត lessons/ (INSTRUCTIONS_KH.md) សម្រាប់ព័ត៌មានបន្ថែម</li>
-                <li>ធ្វើលំហាត់ក្នុងថត lessons/ (PRACTICE_EXERCISES_KH.md) ដើម្បីរៀនអនុវត្តជាក់ស្តែង</li>
-            </ol>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-12">
-        <h3>🔗 ឯកសារមានប្រយោជន៍</h3>
-        <ul>
-            <li><a href="https://docs.djangoproject.com/" target="_blank">Django Documentation</a></li>
-            <li><a href="https://www.django-rest-framework.org/" target="_blank">Django REST Framework</a></li>
-            <li><a href="https://getbootstrap.com/" target="_blank">Bootstrap Documentation</a></li>
-        </ul>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function copyToClipboard(text, btn) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function() {
-            showCopiedFeedback(btn);
-        }).catch(function(err) {
-            fallbackCopy(text, btn);
-        });
-    } else {
-        fallbackCopy(text, btn);
-    }
-}
-
-function fallbackCopy(text, btn) {
-    const tempInput = document.createElement('input');
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand('copy');
-    document.body.removeChild(tempInput);
-    showCopiedFeedback(btn);
-}
-
-function showCopiedFeedback(btn) {
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✅ Copied!';
-    btn.classList.remove('btn-outline-secondary');
-    btn.classList.add('btn-success');
-    setTimeout(function() {
-        btn.innerHTML = originalText;
-        btn.classList.remove('btn-success');
-        btn.classList.add('btn-outline-secondary');
-    }, 1500);
-}
-</script>
 {% endblock %}

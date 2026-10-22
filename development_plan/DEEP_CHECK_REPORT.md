@@ -348,8 +348,7 @@ curl http://127.0.0.1:8000/enrollments/1/
 ### Test 3: Admin Testing
 ```
 1. Login to http://127.0.0.1:8000/admin/
-2. Username: admin
-3. Password: admin123456
+2. Sign in with the superuser account created for this environment.
 4. Test adding student, course, enrollment
 5. Test filtering and searching
 ```
@@ -483,4 +482,3 @@ The project is **suitable for API-first or admin-only usage immediately**, but *
 **Report Generated**: October 1, 2026  
 **Checked By**: Deep System Analysis  
 **Status**: Ready for Fixes
-

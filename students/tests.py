@@ -263,45 +263,29 @@ class RootEndpointsTest(TestCase):
 
 
 class SetupTestDataCommandTest(TestCase):
-    def test_setup_test_data_creates_admin_and_data(self):
+    def test_setup_test_data_seeds_data_without_creating_admin(self):
         from io import StringIO
         from django.core.management import call_command
-        from django.contrib.auth import authenticate
 
         out = StringIO()
         call_command('setup_test_data', student_count=5, stdout=out)
-        
-        # 1. Admin test
-        admin = authenticate(username='admin', password='admin123456')
-        self.assertIsNotNone(admin)
-        self.assertTrue(admin.is_superuser)
-        self.assertTrue(admin.is_staff)
-
-        # 2. Teacher test
-        teacher = authenticate(username='teacher', password='teacher123456')
-        self.assertIsNotNone(teacher)
-        self.assertTrue(teacher.is_staff)
-        self.assertFalse(teacher.is_superuser)
-
-        # 3. Student test
-        student = authenticate(username='student', password='student123456')
-        self.assertIsNotNone(student)
-        self.assertFalse(student.is_staff)
-        self.assertFalse(student.is_superuser)
-        self.assertTrue(hasattr(student, 'student'))
-        self.assertEqual(student.student.student_id, 'STU-BBU-001')
-
+        self.assertFalse(User.objects.filter(username='admin').exists())
         self.assertGreaterEqual(Student.objects.count(), 5)
+        self.assertTrue(
+            all(not user.has_usable_password() for user in User.objects.all())
+        )
 
-    def test_homepage_renders_all_three_role_accounts(self):
-        response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'admin')
-        self.assertContains(response, 'admin123456')
-        self.assertContains(response, 'teacher')
-        self.assertContains(response, 'teacher123456')
-        self.assertContains(response, 'student')
-        self.assertContains(response, 'student123456')
-        self.assertContains(response, 'គណនីសាកល្បងតាមតួនាទីទាំង ៣')
+    def test_setup_test_data_does_not_modify_existing_admin_account(self):
+        from io import StringIO
+        from django.core.management import call_command
 
+        admin = User.objects.create_user(
+            username='admin',
+            password='existing-secure-password',
+        )
+        call_command('setup_test_data', student_count=5, stdout=StringIO())
+        admin.refresh_from_db()
 
+        self.assertTrue(admin.check_password('existing-secure-password'))
+        self.assertFalse(admin.is_staff)
+        self.assertFalse(admin.is_superuser)

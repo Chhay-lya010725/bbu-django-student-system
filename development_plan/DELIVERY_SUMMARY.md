@@ -158,7 +158,7 @@ python manage.py runserver
 
 ### Step 4: Access System
 - **Home**: http://127.0.0.1:8000/
-- **Admin**: http://127.0.0.1:8000/admin/ (admin/admin123456)
+- **Admin**: http://127.0.0.1:8000/admin/ (use your locally configured superuser)
 - **API**: http://127.0.0.1:8000/api/
 - **Students**: http://127.0.0.1:8000/students/
 - **Courses**: http://127.0.0.1:8000/courses/
@@ -351,7 +351,7 @@ Environment:         Python 3.9+
 ### Testing
 ```
 ✅ Server starts without errors
-✅ Admin login works (admin/admin123456)
+✅ Admin login works with the configured superuser
 ✅ URL patterns accessible
 ✅ Database queries working
 ✅ Templates rendering
@@ -526,4 +526,3 @@ This project is ready for your classroom. All code is working, all documentation
 
 Last Updated: October 1, 2024  
 Version: 1.0 (Complete Release)
-

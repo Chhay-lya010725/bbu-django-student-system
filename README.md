@@ -47,19 +47,15 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### ៤. បង្កើតគណនីសាកល្បងទាំង ៣ តួនាទី (Setup 3-Role Test Accounts)
+### ៤. បង្កើតគណនី Admin ដោយសុវត្ថិភាព
 
-ដំណើរការ command តែមួយគត់ដើម្បីបង្កើត/កំណត់គណនីទាំង ៣ តួនាទី និងទិន្នន័យគំរូដោយស្វ័យប្រវត្តិ៖
+បង្កើតគណនី Admin ផ្ទាល់ខ្លួន ដោយប្រើពាក្យសម្ងាត់ឯកជន៖
 
 ```bash
-python manage.py setup_test_data
+python manage.py createsuperuser
 ```
 
-| តួនាទី (Role) | ឈ្មោះគណនី (Username) | ពាក្យសម្ងាត់ (Password) | វិសាលភាពសិទ្ធិ (Access Scope) |
-| :--- | :--- | :--- | :--- |
-| **👑 Admin / Superuser** | `admin` | `admin123456` | សិទ្ធិពេញលេញលើប្រព័ន្ធ, Django Admin Panel (`/admin/`), CRUD គ្រប់យ៉ាង |
-| **👨‍🏫 Faculty / Teacher** | `teacher` | `teacher123456` | សិទ្ធិជាគ្រូ/Staff, មើលបញ្ជីសិស្សទាំងអស់, គ្រប់គ្រងវគ្គ, ដាក់ពិន្ទុ Grade |
-| **🎓 Regular Student** | `student` | `student123456` | សិទ្ធិជានិស្សិត, មើល/កែប្រែបានតែ Profile & Transcript ខ្លួនឯង (ជាប់ isolation) |
+The `setup_test_data` command creates sample records only. It does not create or reset accounts.
 
 ### ៥. ដាក់ដំណើរការ Development Server
 
@@ -67,11 +63,11 @@ python manage.py setup_test_data
 python manage.py runserver
 ```
 
-ចូលប្រើប្រាស់នៅ `http://127.0.0.1:8000/` (ព័ត៌មានគណនីសាកល្បងទាំង ៣ ក៏មានបង្ហាញនៅលើទំព័រដើមផងដែរ)
+ចូលប្រើប្រាស់នៅ `http://127.0.0.1:8000/`
 
 ### ៦. ចូលក្នុង Admin Panel
 
-ចូលក្នុង `http://127.0.0.1:8000/admin/` ដោយប្រើ `admin` / `admin123456`
+ចូលក្នុង `http://127.0.0.1:8000/admin/` ដោយប្រើគណនីដែលបានបង្កើតខាងលើ
 
 
 ---
@@ -213,6 +209,7 @@ POST    /api/courses/               - Create new course
 GET     /api/courses/{id}/          - Get course details
 PUT     /api/courses/{id}/          - Update course
 DELETE  /api/courses/{id}/          - Delete course
+GET     /api/courses/{id}/enrollments/ - Get course enrollments
 GET     /api/courses/{id}/students/ - Get enrolled students
 GET     /api/courses/{id}/enrollment_statistics/ - Get stats
 
@@ -275,30 +272,48 @@ POST    /api/enrollments/{id}/complete_enrollment/ - Mark complete
 
 ## 🏃 ដំណើរការ (Quick Start)
 
-### ១. ចាប់ផ្តើម Server
+### ១. បង្កើត Admin Account
+
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+Set the username, email, and a private password when prompted. The project does not create an
+admin account with a shared default password.
+
+### ២. ចាប់ផ្តើម Server
 
 ```bash
 python manage.py runserver
 ```
 
-### ២. ចូលក្នុង Admin Panel
+### ៣. ចូលក្នុង Admin Panel
 
 - URL: `http://127.0.0.1:8000/admin/`
-- Username: `admin`
-- Password: (លេខសម្ងាត់ដែលបង្កើតរបស់អ្នក)
+- Use the username and password you created above.
 
-### ៣. ចូលក្នុង Websites
+### ៤. ចូលក្នុង Websites
 
 - Students: `http://127.0.0.1:8000/students/`
 - Courses: `http://127.0.0.1:8000/courses/`
 - Enrollments: `http://127.0.0.1:8000/enrollments/`
 
-### ៤. ចូលក្នុង API
+### ៥. ចូលក្នុង API
 
 - API Root: `http://127.0.0.1:8000/api/`
 - Students API: `http://127.0.0.1:8000/api/students/`
 - Courses API: `http://127.0.0.1:8000/api/courses/`
 - Enrollments API: `http://127.0.0.1:8000/api/enrollments/`
+- API endpoints require login. Use `/api-auth/login/` in the browser or authenticate your API client.
+- To use token authentication, POST your credentials as JSON to `/api/token/`:
+  `{"username":"your-username","password":"your-password"}`. Send the returned token on API requests as
+  `Authorization: Token <token>`.
+- Results are paginated (10 per page). Use `?page=2` to request another page.
+- Filtering, search, and ordering are supported. For example:
+  - `/api/students/?city=Phnom%20Penh&search=Sok&ordering=student_id`
+  - `/api/courses/?level=100&search=programming&ordering=-start_date`
+  - `/api/enrollments/?status=COMPLETED&student__student_id=BBU-2024-0001`
 
 ---
 
@@ -454,4 +469,3 @@ This is a complete demo project ready for classroom use:
 ---
 
 ### 🌟 Happy Learning! សប្ដាធម្ម!
-

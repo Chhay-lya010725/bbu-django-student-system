@@ -2,10 +2,18 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Avg
+from django.utils import timezone
 from students.models import Student
 from courses.models import Course
 from enrollments.models import Enrollment
-from student_system.serializers import StudentSerializer, CourseSerializer, EnrollmentSerializer, EnrollmentDetailSerializer
+from student_system.serializers import (
+    StudentSerializer,
+    CourseSerializer,
+    EnrollmentSerializer,
+    EnrollmentDetailSerializer,
+    EnrollmentGradeSerializer,
+)
 
 class StudentViewSet(viewsets.ModelViewSet):
     """ViewSet for Student API endpoints"""
@@ -36,9 +44,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         """Get academic transcript for a student"""
         student = self.get_object()
         enrollments = student.enrollments.filter(status='COMPLETED')
-        
-        total_score = sum([e.score or 0 for e in enrollments if e.score])
-        average_score = total_score / len(enrollments) if enrollments else 0
+        average_score = enrollments.aggregate(average=Avg('score'))['average'] or 0
         
         data = {
             'student_id': student.student_id,
@@ -55,6 +61,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     """ViewSet for Course API endpoints"""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]
     filterset_fields = ['status', 'level']
     search_fields = ['code', 'title', 'instructor__username']
     ordering_fields = ['code', 'start_date', 'capacity']
@@ -89,7 +96,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             'total_enrolled': enrollments.filter(status='ENROLLED').count(),
             'total_completed': enrollments.filter(status='COMPLETED').count(),
             'total_dropped': enrollments.filter(status='DROPPED').count(),
-            'average_score': enrollments.filter(score__isnull=False).values('score').aggregate(avg=__import__('django.db.models', fromlist=['Avg']).Avg('score'))['avg'] or 0,
+            'average_score': enrollments.aggregate(avg=Avg('score'))['avg'] or 0,
         }
         return Response(data)
 
@@ -107,17 +114,13 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
     def submit_grade(self, request, pk=None):
         """Submit or update grade for an enrollment"""
         enrollment = self.get_object()
-        
-        if 'score' in request.data:
-            enrollment.score = request.data['score']
-        
-        if 'attendance_percentage' in request.data:
-            enrollment.attendance_percentage = request.data['attendance_percentage']
-        
-        if 'notes' in request.data:
-            enrollment.notes = request.data['notes']
-        
-        enrollment.save()
+        grade_serializer = EnrollmentGradeSerializer(
+            enrollment,
+            data=request.data,
+            partial=True,
+        )
+        grade_serializer.is_valid(raise_exception=True)
+        grade_serializer.save()
         serializer = self.get_serializer(enrollment)
         return Response(serializer.data)
     
@@ -126,7 +129,7 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
         """Mark an enrollment as completed"""
         enrollment = self.get_object()
         enrollment.status = 'COMPLETED'
-        enrollment.completed_date = __import__('django.utils.timezone', fromlist=['now']).now().date()
+        enrollment.completed_date = timezone.now().date()
         enrollment.save()
         serializer = self.get_serializer(enrollment)
         return Response(serializer.data)

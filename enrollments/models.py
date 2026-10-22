@@ -61,6 +61,6 @@ class Enrollment(models.Model):
     
     def save(self, *args, **kwargs):
         """Automatically calculate grade before saving"""
-        if self.score and not self.grade:
+        if self.score is not None:
             self.grade = self.calculate_grade()
         super().save(*args, **kwargs)

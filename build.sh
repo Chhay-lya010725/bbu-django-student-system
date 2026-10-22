@@ -18,7 +18,7 @@ python manage.py collectstatic --no-input
 echo "🗄️ Running database migrations..."
 python manage.py migrate
 
-echo "👤 Initializing admin user (admin / admin123456) and test data..."
+echo "🌱 Initializing sample data if the database is empty..."
 python manage.py setup_test_data --student-count 100
 
 echo "✅ Build completed successfully!"

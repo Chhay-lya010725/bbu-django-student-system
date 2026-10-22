@@ -71,8 +71,7 @@ http://127.0.0.1:8000/
 
 # 5. Admin login (optional)
 http://127.0.0.1:8000/admin/
-Username: admin
-Password: admin123456
+Sign in with a superuser created using `python manage.py createsuperuser`.
 ```
 
 ### That's It! 🎉
@@ -330,7 +329,7 @@ $ cp db.sqlite3 db.sqlite3.backup
    
 3. Show Admin Panel (30 sec)
    → http://127.0.0.1:8000/admin/
-   → Login with admin/admin123456
+   → Sign in with the superuser configured for this environment
    → Show Student list
    → Add new student
    
@@ -488,4 +487,3 @@ python manage.py runserver
 ```
 
 ### Then visit: http://127.0.0.1:8000/ 🚀
-

@@ -69,3 +69,10 @@ class EnrollmentDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'student_id', 'course_code', 'course_title', 'status', 
                   'grade', 'score', 'attendance_percentage', 'notes', 
                   'enrollment_date', 'completed_date']
+
+
+class EnrollmentGradeSerializer(serializers.ModelSerializer):
+    """Validate grade updates using the same constraints as enrollment forms."""
+    class Meta:
+        model = Enrollment
+        fields = ['score', 'attendance_percentage', 'notes']

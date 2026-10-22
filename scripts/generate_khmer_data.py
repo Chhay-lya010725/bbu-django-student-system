@@ -350,82 +350,27 @@ def generate_cambodian_phone():
     number = random.randint(100000, 999999)
     return f"{prefix}{number}"
 
+
+def _safe_print(*values, sep=" ", end="\n"):
+    text = sep.join(str(value) for value in values) + end
+    try:
+        sys.stdout.write(text)
+    except UnicodeEncodeError:
+        encoding = sys.stdout.encoding or "utf-8"
+        sys.stdout.write(text.encode(encoding, errors="replace").decode(encoding))
+
+
 def run_seed(num_students=1000):
-    print("=" * 65)
-    print("🚀 Build Bright University (BBU) - Seeding Khmer IT Data")
-    print(f"🎯 Target: {num_students} Students, 25 IT Courses, 2,500+ Enrollments")
-    print("=" * 65)
+    _safe_print("=" * 65)
+    _safe_print("🚀 Build Bright University (BBU) - Seeding Khmer IT Data")
+    _safe_print(f"🎯 Target: {num_students} Students, 25 IT Courses, 2,500+ Enrollments")
+    _safe_print("=" * 65)
 
     with transaction.atomic():
-        # 1. Create Instructors & Role Test Accounts
-        print("\n[1/4] 👨‍🏫 Creating IT Faculty Instructors & Demo Accounts...")
+        # 1. Create Instructors
+        _safe_print("\n[1/4] 👨‍🏫 Creating IT Faculty Instructors...")
         instructor_objs = []
-        default_pw_hash = make_password("BbuFaculty@2026")
-        
-        # Ensure 'admin' Superuser Account
-        admin_user, _ = User.objects.get_or_create(
-            username="admin",
-            defaults={
-                "first_name": "System",
-                "last_name": "Administrator",
-                "email": "admin@bbu.edu.kh",
-                "is_staff": True,
-                "is_superuser": True,
-            }
-        )
-        admin_user.set_password("admin123456")
-        admin_user.is_staff = True
-        admin_user.is_superuser = True
-        admin_user.save()
-
-        # Ensure 'teacher' Faculty Account
-        teacher_user, _ = User.objects.get_or_create(
-            username="teacher",
-            defaults={
-                "first_name": "Vichea (វិជ្ជា)",
-                "last_name": "Heng (ហេង)",
-                "email": "teacher@bbu.edu.kh",
-                "is_staff": True,
-                "is_superuser": False,
-            }
-        )
-        teacher_user.set_password("teacher123456")
-        teacher_user.is_staff = True
-        teacher_user.is_superuser = False
-        teacher_user.save()
-        instructor_objs.append(teacher_user)
-
-        # Ensure 'student' Demo Account
-        student_user, _ = User.objects.get_or_create(
-            username="student",
-            defaults={
-                "first_name": "Dara",
-                "last_name": "Sok",
-                "email": "student@bbu.edu.kh",
-                "is_staff": False,
-                "is_superuser": False,
-            }
-        )
-        student_user.set_password("student123456")
-        student_user.is_staff = False
-        student_user.is_superuser = False
-        student_user.save()
-
-        Student.objects.update_or_create(
-            user=student_user,
-            defaults={
-                "student_id": "STU-BBU-001",
-                "khmer_name": "សុខ ដារ៉ា",
-                "date_of_birth": date(2003, 5, 15),
-                "gender": "M",
-                "phone_number": "012888999",
-                "address": "Street 271, Sangkat Boeung Tumpun",
-                "city": "Phnom Penh (ភ្នំពេញ)",
-                "country": "Cambodia (កម្ពុជា)",
-                "is_active": True,
-            }
-        )
-
+        default_pw_hash = make_password(None)
         for username, first_name, last_name, email in INSTRUCTORS_DATA:
             user, created = User.objects.get_or_create(
                 username=username,
@@ -438,10 +383,10 @@ def run_seed(num_students=1000):
                 }
             )
             instructor_objs.append(user)
-        print(f"      ✅ {len(instructor_objs)} Instructors ready (including 'teacher').")
+        _safe_print(f"      ✅ {len(instructor_objs)} Instructors ready.")
 
         # 2. Create Courses
-        print("\n[2/4] 📚 Creating BBU IT Courses...")
+        _safe_print("\n[2/4] 📚 Creating BBU IT Courses...")
         course_objs = []
         base_start = date(2024, 1, 15)
         base_end = date(2024, 6, 15)
@@ -463,16 +408,16 @@ def run_seed(num_students=1000):
                 }
             )
             course_objs.append(course)
-        print(f"      ✅ {len(course_objs)} IT Courses configured.")
+        _safe_print(f"      ✅ {len(course_objs)} IT Courses configured.")
 
         # 3. Create Students (Batch Generation)
-        print(f"\n[3/4] 🎓 Generating {num_students} Khmer Student Records...")
+        _safe_print(f"\n[3/4] 🎓 Generating {num_students} Khmer Student Records...")
         
         # Determine existing student count for unique IDs
         existing_students = set(Student.objects.values_list('student_id', flat=True))
         existing_usernames = set(User.objects.values_list('username', flat=True))
         
-        student_pw_hash = make_password("Student@123456")
+        student_pw_hash = make_password(None)
         
         new_users = []
         user_meta = [] # Store student metadata associated with user
@@ -552,7 +497,7 @@ def run_seed(num_students=1000):
                 "is_active": random.random() > 0.04, # 96% active
             })
 
-        print("      📦 Bulk saving User accounts...")
+        _safe_print("      📦 Bulk saving User accounts...")
         User.objects.bulk_create(new_users, batch_size=500)
 
         # Retrieve created users to get their DB primary keys
@@ -578,15 +523,15 @@ def run_seed(num_students=1000):
             )
             student_objs.append(student)
 
-        print("      📦 Bulk saving Student profiles...")
+        _safe_print("      📦 Bulk saving Student profiles...")
         Student.objects.bulk_create(student_objs, batch_size=500)
         
         # Retrieve saved students
         saved_students = list(Student.objects.filter(student_id__in=[s.student_id for s in student_objs]))
-        print(f"      ✅ {len(saved_students)} Students successfully created.")
+        _safe_print(f"      ✅ {len(saved_students)} Students successfully created.")
 
         # 4. Assign Course Enrollments
-        print("\n[4/4] 📝 Assigning Course Enrollments & Computing Grades...")
+        _safe_print("\n[4/4] 📝 Assigning Course Enrollments & Computing Grades...")
         enrollment_objs = []
         student_gpa_map = {s.id: [] for s in saved_students}
 
@@ -663,12 +608,12 @@ def run_seed(num_students=1000):
                 )
                 enrollment_objs.append(enrollment)
 
-        print(f"      📦 Bulk saving {len(enrollment_objs)} Enrollments...")
+        _safe_print(f"      📦 Bulk saving {len(enrollment_objs)} Enrollments...")
         Enrollment.objects.bulk_create(enrollment_objs, batch_size=1000)
-        print(f"      ✅ {len(enrollment_objs)} Enrollments created.")
+        _safe_print(f"      ✅ {len(enrollment_objs)} Enrollments created.")
 
         # Update student GPAs based on completed courses
-        print("\n📊 Updating Student GPAs...")
+        _safe_print("\n📊 Updating Student GPAs...")
         students_to_update = []
         for student in saved_students:
             points = student_gpa_map.get(student.id, [])
@@ -680,17 +625,14 @@ def run_seed(num_students=1000):
             students_to_update.append(student)
 
         Student.objects.bulk_update(students_to_update, ['gpa'], batch_size=500)
-        print(f"      ✅ {len(students_to_update)} Student GPAs computed and saved.")
+        _safe_print(f"      ✅ {len(students_to_update)} Student GPAs computed and saved.")
 
-    print("\n" + "=" * 65)
-    print("🎉 DATA SEEDING COMPLETE!")
-    print(f"👥 Total Students in System:    {Student.objects.count():,}")
-    print(f"📚 Total IT Courses in System: {Course.objects.count():,}")
-    print(f"📝 Total Enrollments in System:{Enrollment.objects.count():,}")
-    print(f"👑 Admin Superuser Account:     admin   / admin123456")
-    print(f"👨‍🏫 Faculty Teacher Account:     teacher / teacher123456")
-    print(f"🎓 Regular Student Account:     student / student123456")
-    print("=" * 65)
+    _safe_print("\n" + "=" * 65)
+    _safe_print("🎉 DATA SEEDING COMPLETE!")
+    _safe_print(f"👥 Total Students in System:    {Student.objects.count():,}")
+    _safe_print(f"📚 Total IT Courses in System: {Course.objects.count():,}")
+    _safe_print(f"📝 Total Enrollments in System:{Enrollment.objects.count():,}")
+    _safe_print("=" * 65)
 
 if __name__ == '__main__':
     count = 1000
