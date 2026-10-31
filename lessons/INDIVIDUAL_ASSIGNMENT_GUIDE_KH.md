@@ -189,7 +189,7 @@ git push -u origin main
    - **Name**: ដាក់ឈ្មោះ Web Service របស់អ្នក (ឧ. `bbu-student-yourname`)
    - **Runtime**: `Python 3`
    - **Build Command**: `./build.sh`
-   - **Start Command**: `python manage.py migrate && python manage.py setup_test_data --student-count 100 && gunicorn student_system.wsgi:application`
+   - **Start Command**: `gunicorn student_system.wsgi:application --bind 0.0.0.0:$PORT`
    - **Instance Type**: **Free**
 ៤. **បញ្ចូល Environment Variables**:
    - `DEBUG`: `False`
